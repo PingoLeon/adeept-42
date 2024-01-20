@@ -1,8 +1,10 @@
 # initservo.py
 import time
 import Adafruit_PCA9685
+import os
+os.environ['PYTHONDONTWRITEBYTECODE'] = '1'
 
-def reset_servo():
+def reset():
     # Initialise the PCA9685 using the default address (0x40).
     pwm = Adafruit_PCA9685.PCA9685()
     pwm.set_pwm_freq(50)
@@ -13,7 +15,7 @@ def reset_servo():
 
 if __name__ == "__main__":
     # If this script is executed directly, call the function
-    reset_servo()
+    reset()
 
 	
 

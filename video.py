@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 import time
+import os
+os.environ['PYTHONDONTWRITEBYTECODE'] = '1'
 
 def camera():
 

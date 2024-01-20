@@ -6,6 +6,7 @@
 # Date        : 2019/11/21
 import sys
 sys.path.insert(0,'/home/pi/adeept_picar-b/server/')
+sys.dont_write_bytecode = True
 import RPi.GPIO as GPIO
 import time
 import GUImove as move
