@@ -1,9 +1,6 @@
 #import opencv
 import cv2
 import numpy as np
-import os
-os.environ['PYTHONDONTWRITEBYTECODE'] = '1'
-
 #Initialisation de la vidéo
 video = cv2.VideoCapture(0)
 

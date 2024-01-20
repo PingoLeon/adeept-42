@@ -2,8 +2,6 @@ import time
 import initservo as servo
 import sys
 sys.path.insert(0,'/home/pi/adeept_picar-b/server/')
-import os
-os.environ['PYTHONDONTWRITEBYTECODE'] = '1'
 import RPIservo
 
 

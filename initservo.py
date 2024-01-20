@@ -1,8 +1,6 @@
 # initservo.py
 import time
 import Adafruit_PCA9685
-import os
-os.environ['PYTHONDONTWRITEBYTECODE'] = '1'
 
 def reset():
     # Initialise the PCA9685 using the default address (0x40).
