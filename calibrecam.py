@@ -27,7 +27,7 @@ green_counter = 0
 yellow_counter = 0
 triangle_counter = 0
 
-number_of_rectangles_counted = 8
+number_of_rectangles_counted = 4
 
 # Threshold for considering rectangles as the same position
 position_threshold = 10

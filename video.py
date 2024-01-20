@@ -122,6 +122,7 @@ def camera():
             print("Red detected!")
             red_counter = 0
             red_positions.clear()
+            cv2.imwrite('red.jpg', combined_red)
             return 1
 
         # Check if a green rectangle is detected
@@ -148,6 +149,7 @@ def camera():
             print("Green detected!")
             green_counter = 0
             green_positions.clear()
+            cv2.imwrite('green.jpg', output_green)
             return 2
 
         # Check if a yellow rectangle is detected
@@ -174,9 +176,9 @@ def camera():
             print("Yellow detected!")
             yellow_counter = 0
             yellow_positions.clear()
+            cv2.imwrite('yellow.jpg', output_yellow)
             return 3
 
     # If no color is detected within the specified time, return 0
-    print("No color detected within the time limit.")
     return 0
 

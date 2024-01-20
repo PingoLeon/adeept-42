@@ -6,27 +6,17 @@ import RPIservo
 
 
 # Initialize the pan servo controller for left and right movement
-P_sc = RPIservo.ServoCtrl()
-P_sc.start()
+head = RPIservo.ServoCtrl()
+head.start()
 
-# Function to tilt the head to the left with a wider angle
-def tilt_head_left():
-    print("Head Going Left\n")
-    P_sc.singleServo(1, 1, 7)  # Adjust the third argument for the desired speed
-    time.sleep(0.7)
-    P_sc.stopWiggle()  # Stop the servo movement after 0.2 seconds
+def reset():
+    servo.reset()
 
-
-# Function to tilt the head to the right with a wider angle
 def tilt_head_right():
-    print("Head Going Left\n")
-    P_sc.singleServo(1, -1, 5)  # Adjust the third argument for the desired speed
-    time.sleep(0.5)
-    P_sc.stopWiggle()  # Stop the servo movement after 0.2 seconds
+    head.moveAngle(1, -45)
 
-def reset_head():
-    
-    servo.reset_servo()
+def tilt_head_left():
+    head.moveAngle(1, 45)
 
 # Function to tilt the head based on the current position
 def tilt_head(position):
@@ -34,3 +24,12 @@ def tilt_head(position):
         tilt_head_left()
     elif position == "right":
         tilt_head_right()
+
+if __name__ == "__main__":
+    reset()
+    time.sleep(1)
+    tilt_head_left()
+    time.sleep(1)
+    tilt_head_right()
+    time.sleep(1)
+    reset()
