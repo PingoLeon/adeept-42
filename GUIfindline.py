@@ -73,18 +73,27 @@ def checkcam():
     time.sleep(0.5)
     print("On regarde à droite")
     value_return = camera() # 0 --> aucun panneau détecté / 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
-
+    
     if value_return == 0:
         print("Aucun panneau détecté à droite")
         head.tilt_head('left')
         time.sleep(0.5)
         print("On regarde à gauche")
-
         value_return = camera() # 0 --> aucun panneau détecté / 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
-
+        
         if value_return == 0:
             print("Aucun panneau détecté à gauche")
-            return 0
+            
+            head.reset()
+            time.sleep(0.5)
+            print("On regarde tout droit")
+            value_return = camera() # 0 --> aucun panneau détecté / 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
+            if value_return == 0:
+                print("Aucun panneau détecté nulle part")
+                return 0
+            else:
+                behavior(value_return)
+                return 1
         else:
             behavior(value_return)
             return 1
@@ -97,8 +106,6 @@ def run(previous_move, number_of_tiret):
     status_right = GPIO.input(line_pin_right)
     status_middle = GPIO.input(line_pin_middle)
     status_left = GPIO.input(line_pin_left)
-
-
 
     if status_right == 1 and status_middle == 1 and status_left == 1 and previous_move != "Camera" and number_of_tiret < number_of_tiret_max:
         number_of_tiret += 1
@@ -114,7 +121,6 @@ def run(previous_move, number_of_tiret):
         time.sleep(0.5)
         previous_move = "Camera"
         
-    
     elif status_right == color_select:
         if previous_move != "Left":
             print('à gauche')

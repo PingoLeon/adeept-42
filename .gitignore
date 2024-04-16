@@ -1,6 +1,4 @@
-__pycache__/headrotate.cpython-37.pyc
-__pycache__/video.cpython-37.pyc
-__pycache__/initservo.cpython-37.pyc
+__pycache__/
 
 *.png
 *.jpg
