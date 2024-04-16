@@ -8,7 +8,7 @@ import cv2
 
 '''
 #!Détection d'Arucos et entourer les coins de l'aruco avec un quadrilatère
-#!Pas de maière directe en live
+#!Pas de manière directe en live
 '''
 
 
