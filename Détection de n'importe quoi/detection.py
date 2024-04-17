@@ -103,7 +103,7 @@ def detection():
         bottom_left = np.array([top_left[0], bottom_right[1]])
 
         # On spécifie les coordonnées des coins de l'image zoomée, +30 Pixels pour enlever les arucos de la zone et ainsi éviter les erreurs avec GoodFeaturesToTrack
-        offset = 20
+        offset = 25
         points1 = np.float32([top_left + [offset, offset], top_right + [-offset, offset], bottom_right + [-offset, -offset], bottom_left + [offset, -offset]])
         points2 = np.float32([[0, 0], [200, 0], [200, 200], [0, 200]])
 
@@ -121,7 +121,7 @@ def detection():
         #! Recherche d'une flèche dans l'image zoomée et détermination de son sens
         if idsMarqueur[0] == 8: #? L'ID des rectangles de couleur est 8
             print("🤔 Il devrait y avoir un rectangle de couleur dans la zone zoomée")
-            value_return = rectangle.detect_rectangle() 
+            value_return = rectangle.detect_color() 
             return value_return # 0 --> rien détecté / 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
         elif idsMarqueur[0] == 13: #? L'ID de la flèche est 13
             print("🔍 On recherche une flèche dans l'image zoomée")
