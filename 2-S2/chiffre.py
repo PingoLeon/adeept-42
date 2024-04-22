@@ -77,3 +77,6 @@ def detect_chiffre():
         cv2.imshow('Zones trouvées', image)  
         cv2.waitKey(0)
         return 1
+    
+if __name__ == "__main__":
+    detect_chiffre()

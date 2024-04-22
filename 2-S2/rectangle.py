@@ -48,3 +48,6 @@ def detect_color():
     # Retourner la valeur correspondante
     return color_return_map[max_color[0]]
 
+if __name__ == "__main__":
+    detect_color()
+

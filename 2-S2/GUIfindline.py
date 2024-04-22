@@ -11,7 +11,7 @@ import time
 import GUImove as move
 import servo
 import LED
-import headrotate as head
+import head
 from detection import detection as camera
 import RGB
 

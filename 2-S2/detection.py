@@ -137,5 +137,5 @@ def detection():
         print("🚫 Erreur :", e)
         
 
-#? Tests
-detection()
+if __name__ == "__main__":
+    detection()

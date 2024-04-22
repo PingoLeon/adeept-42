@@ -1,8 +1,8 @@
 import time
-import initservo as servo
 import sys
 sys.path.insert(0,'/home/pi/adeept-picar-b-gitless/server/')
 import RPIservo
+import Adafruit_PCA9685
 
 
 # Initialize the pan servo controller for left and right movement
@@ -10,7 +10,13 @@ head = RPIservo.ServoCtrl()
 head.start()
 
 def reset():
-    servo.reset()
+    # Initialise the PCA9685 using the default address (0x40).
+    pwm = Adafruit_PCA9685.PCA9685()
+    pwm.set_pwm_freq(50)
+    x = 0
+    while x < 16:
+        pwm.set_all_pwm(0, 300)
+        x += 1
 
 def tilt_head_right():
     head.moveAngle(1, -45)
@@ -26,10 +32,4 @@ def tilt_head(position):
         tilt_head_right()
 
 if __name__ == "__main__":
-    reset()
-    time.sleep(1)
-    tilt_head_left()
-    time.sleep(1)
-    tilt_head_right()
-    time.sleep(1)
     reset()

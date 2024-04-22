@@ -90,7 +90,7 @@ while True:
 
     # Check if a red rectangle is detected
     mask_red = cv2.add(mask, mask2)
-    _, red_contours, _ = cv2.findContours(mask_red, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    red_contours, _ = cv2.findContours(mask_red, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for count in red_contours:
         epsilon = 0.02 * cv2.arcLength(count, True)
         approx = cv2.approxPolyDP(count, epsilon, True)
@@ -115,7 +115,7 @@ while True:
         red_positions.clear()
 
     # Check if a green rectangle is detected
-    _, green_contours, _ = cv2.findContours(mask_green, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    green_contours, _ = cv2.findContours(mask_green, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for count in green_contours:
         epsilon = 0.02 * cv2.arcLength(count, True)
         approx = cv2.approxPolyDP(count, epsilon, True)
@@ -140,7 +140,7 @@ while True:
         green_positions.clear()
 
     # Check if a yellow rectangle is detected
-    _, yellow_contours, _ = cv2.findContours(mask_yellow, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    yellow_contours, _ = cv2.findContours(mask_yellow, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for count in yellow_contours:
         epsilon = 0.02 * cv2.arcLength(count, True)
         approx = cv2.approxPolyDP(count, epsilon, True)

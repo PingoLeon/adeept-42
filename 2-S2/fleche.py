@@ -51,6 +51,9 @@ def detect_fleche():
         cv2.waitKey(0)
         
         return 5
+    
+if __name__ == "__main__":
+    detect_fleche()
 
 
     
