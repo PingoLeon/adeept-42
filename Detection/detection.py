@@ -103,7 +103,7 @@ def detection():
         bottom_left = np.array([top_left[0], bottom_right[1]])
 
         # On spécifie les coordonnées des coins de l'image zoomée, +30 Pixels pour enlever les arucos de la zone et ainsi éviter les erreurs avec GoodFeaturesToTrack
-        offset = 25
+        offset = 35
         points1 = np.float32([top_left + [offset, offset], top_right + [-offset, offset], bottom_right + [-offset, -offset], bottom_left + [offset, -offset]])
         points2 = np.float32([[0, 0], [200, 0], [200, 200], [0, 200]])
 
@@ -137,5 +137,5 @@ def detection():
         print("🚫 Erreur :", e)
         
 
-#? Tests
-detection()
+if __name__ == "__main__":
+    detection()
