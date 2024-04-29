@@ -4,7 +4,7 @@ import numpy as np
 # Définir les plages de couleur comme des variables globales
 limite1Rouge = [([179,100,100],[180,255,255])]
 limite2Rouge = [([0,100,100],[9,255,255])]
-limiteVert = [([50, 100, 100], [70, 255, 255])]
+limiteVert = [([50, 100, 100], [80, 255, 255])]
 limiteJaune = [([20, 100, 100], [42, 255, 255])]
 
 def detect_color():
