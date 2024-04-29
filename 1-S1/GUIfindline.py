@@ -5,7 +5,7 @@
 # Author      : William
 # Date        : 2019/11/21
 import sys
-sys.path.insert(0,'/home/pi/adeept-picar-b-gitless/server/')
+sys.path.insert(0,'/home/pi/adeept_picar-b/server/')
 import RPi.GPIO as GPIO
 import time
 import GUImove as move
