@@ -15,6 +15,22 @@ import chiffre
 import fleche
 import rectangle
 
+def aruco_detect(image_path):
+        
+    dictionnaire = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
+
+    # Récupérer la version d'OpenCV
+    version_opencv = list(map(int, cv2.__version__.split('.')[:2]))
+    # Créer les paramètres de détection en fonction de la version d'OpenCV
+    if version_opencv[0] > 4 or (version_opencv[0] == 4 and version_opencv[1] >= 7):
+        parametres = cv2.aruco.DetectorParameters()
+        coinsMarqueurs, idsMarqueur, _ = cv2.aruco.ArucoDetector(dictionnaire, parametres).detectMarkers(cv2.imread(image_path))
+    else:
+        parametres = cv2.aruco.DetectorParameters_create()
+        coinsMarqueurs, idsMarqueur, _ = cv2.aruco.detectMarkers(cv2.imread(image_path), dictionnaire, parameters=parametres)
+        
+    return coinsMarqueurs, idsMarqueur
+
 
 def detection(): 
     try:
@@ -27,10 +43,9 @@ def detection():
         #image = cv2.imread('Cours1 S2-20240228\\flecheAR.jpg')
         
         #!trouve 4 ARuco avec le même identifiant dans l’image, sinon renvoie une erreur
-        dictionnaire = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
-        parametres =  cv2.aruco.DetectorParameters()
-        coinsMarqueurs, idsMarqueur, PotentielsMarqueurs = cv2.aruco.ArucoDetector(dictionnaire, parametres).detectMarkers(cv2.imread('opencv1.png'))
-
+        # Initialisation de la détection des Arucos
+        coinsMarqueurs, idsMarqueur = aruco_detect("opencv1.png")
+        
         print("📡 Recherche des 4 ARuco avec le même identifiant ...")
         animation = "|||||/////-----\\\\\\"
         i = 0
@@ -40,7 +55,8 @@ def detection():
                 break
 
             x, image = camera.read()
-            coinsMarqueurs, idsMarqueur, PotentielsMarqueurs = cv2.aruco.ArucoDetector(dictionnaire, parametres).detectMarkers(image)
+            
+            coinsMarqueurs, idsMarqueur= aruco_detect("opencv1.png")
             
 
             # Arrêt au bout de 10 secondes sans détection (une boucle dure environ 0.03s, donc 333 boucles ~= 10s)
