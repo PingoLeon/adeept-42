@@ -15,7 +15,12 @@ import chiffre
 import fleche
 import rectangle
 
-def aruco_detect(image_path):
+def aruco_detect(input):
+    
+    if isinstance(input, str):
+        image = cv2.imread(input)
+    else:
+        image = input
         
     dictionnaire = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
 
@@ -24,10 +29,10 @@ def aruco_detect(image_path):
     # Créer les paramètres de détection en fonction de la version d'OpenCV
     if version_opencv[0] > 4 or (version_opencv[0] == 4 and version_opencv[1] >= 7):
         parametres = cv2.aruco.DetectorParameters()
-        coinsMarqueurs, idsMarqueur, _ = cv2.aruco.ArucoDetector(dictionnaire, parametres).detectMarkers(cv2.imread(image_path))
+        coinsMarqueurs, idsMarqueur, _ = cv2.aruco.ArucoDetector(dictionnaire, parametres).detectMarkers(image)
     else:
         parametres = cv2.aruco.DetectorParameters_create()
-        coinsMarqueurs, idsMarqueur, _ = cv2.aruco.detectMarkers(cv2.imread(image_path), dictionnaire, parameters=parametres)
+        coinsMarqueurs, idsMarqueur, _ = cv2.aruco.detectMarkers(image, dictionnaire, parameters=parametres)
         
     return coinsMarqueurs, idsMarqueur
 
@@ -56,7 +61,7 @@ def detection():
 
             x, image = camera.read()
             
-            coinsMarqueurs, idsMarqueur= aruco_detect("opencv1.png")
+            coinsMarqueurs, idsMarqueur = aruco_detect(image)
             
 
             # Arrêt au bout de 10 secondes sans détection (une boucle dure environ 0.03s, donc 333 boucles ~= 10s)
