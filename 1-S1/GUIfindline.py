@@ -29,9 +29,12 @@ def setup():
 
 led = LED.LED()
 turn_status = 0
-speed = 55
-angle_rate = 0.2
-speed_turn = 55
+#speed = 55
+#angle_rate = 0.2
+#speed_turn = 55
+speed = 70
+angle_rate = 0.50
+speed_turn = 70
 color_select = 1 # 0 --> white line / 1 --> black line
 check_true_out = 0
 backing = 0
@@ -206,3 +209,5 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         head.reset_head()
         move.destroy()
+        led.colorWipe(0,0,0)
+        RGB.both_off()

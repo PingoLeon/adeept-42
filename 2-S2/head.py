@@ -1,6 +1,6 @@
 import time
 import sys
-sys.path.insert(0,'/home/pi/adeept-picar-b-gitless/server/')
+sys.path.insert(0,'/home/pi/adeept_picar-b/server/')
 import RPIservo
 import Adafruit_PCA9685
 
