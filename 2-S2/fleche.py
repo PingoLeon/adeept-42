@@ -36,7 +36,7 @@ def detect_fleche():
     print("🎯 Flèche détectée ! Son sens est à ", end="")
     #on finit par afficher le sens de notre flèche
     if nbSommetsDroite>nbSommetsGauche:
-        print('Droite')
+        print('Droite ➡️')
         
         #les prochaines lignes ne servent qu'à l'affichage graphique
         cv2.imshow('Flèche trouvée !',img)
@@ -44,16 +44,13 @@ def detect_fleche():
         
         return 4
     else:
-        print('Gauche')
+        print('Gauche ⬅️')
         
         #les prochaines lignes ne servent qu'à l'affichage graphique
         cv2.imshow('Flèche trouvée !',img)
         cv2.waitKey(0)
         
         return 5
-    
-if __name__ == "__main__":
-    detect_fleche()
 
 
     

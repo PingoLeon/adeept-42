@@ -5,7 +5,6 @@
 # Author      : William
 # Date        : 2019/11/21
 import sys
-from detection import detection
 sys.path.insert(0,'/home/pi/adeept_picar-b/server/')
 import RPi.GPIO as GPIO
 import time
@@ -42,65 +41,6 @@ def stop_robot():
     move.move(0, 'stop')  # Arrête le mouvement du robot
     servo.turnMiddle()     # Centre le servo (arrête le virage)
 
-def behavior(value_return):
-    if value_return == 1:
-        print("\n### Un rectangle rouge a été détecté ! ###\n")
-        head.reset()
-        RGB.both_off()
-        RGB.red()
-        time.sleep(10)
-
-    elif value_return == 2:
-        print("\n### Un rectangle vert a été détecté ! ###\n")
-        head.reset()
-        RGB.both_off()
-        RGB.green()
-
-    elif value_return == 3:
-        print("\n### Un rectangle jaune a été détecté ! ###\n")
-        head.reset()
-        RGB.both_off()
-        RGB.yellow()
-
-
-def checkcam():
-    print('\n--CAMERA CHECK--\n')
-    RGB.both_off()
-
-    head.reset()
-    time.sleep(0.1)
-    head.tilt_head('right')
-    time.sleep(0.5)
-    print("On regarde à droite")
-    value_return = detection() # 0 --> aucun panneau détecté / 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
-    
-    if value_return == 0:
-        print("Aucun panneau détecté à droite")
-        head.tilt_head('left')
-        time.sleep(0.5)
-        print("On regarde à gauche")
-        value_return = detection() # 0 --> aucun panneau détecté / 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
-        
-        if value_return == 0:
-            print("Aucun panneau détecté à gauche")
-            
-            head.reset()
-            time.sleep(0.5)
-            print("On regarde tout droit")
-            value_return = detection() # 0 --> aucun panneau détecté / 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
-            if value_return == 0:
-                print("Aucun panneau détecté nulle part")
-                return 0
-            else:
-                behavior(value_return)
-                return 1
-        else:
-            behavior(value_return)
-            return 1
-    else:
-        behavior(value_return)
-        return 1
-
 def run(previous_move, number_of_tiret):
     global turn_status, speed, angle_rate, color_select, led, check_true_out, backing, last_turn
     status_right = GPIO.input(line_pin_right)
@@ -109,13 +49,13 @@ def run(previous_move, number_of_tiret):
 
     if status_right == 1 and status_middle == 1 and status_left == 1 and previous_move != "Camera" and number_of_tiret < number_of_tiret_max:
         number_of_tiret += 1
-        print("Nombre de tirets : ", number_of_tiret)
+        print("On s'arrête ! On en est à ", number_of_tiret, " tirets")
         if number_of_tiret == number_of_tiret_max:
             stop_robot()
             print("Circuit terminé !")
+            led.rainbow()
             exit()
         stop_robot()
-        checkcam()
         time.sleep(2)
         move.move(60, 'forward')
         time.sleep(0.5)
@@ -206,4 +146,5 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         head.reset_head()
         move.destroy()
-        LED_ctrl.stop()
+        led.rainbow()
+        

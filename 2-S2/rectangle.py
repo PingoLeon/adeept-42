@@ -2,9 +2,9 @@ import cv2
 import numpy as np
 
 # Définir les plages de couleur comme des variables globales
-limite1Rouge = [([150,100,100],[180,255,255])]
-limite2Rouge = [([0,100,100],[7,255,255])]
-limiteVert = [([50, 100, 100], [70, 255, 255])]
+limite1Rouge = [([179,100,100],[180,255,255])]
+limite2Rouge = [([0,100,100],[9,255,255])]
+limiteVert = [([40, 100, 100], [80, 255, 255])]
 limiteJaune = [([20, 100, 100], [42, 255, 255])]
 
 def detect_color():
@@ -21,7 +21,7 @@ def detect_color():
     mask_yellow = cv2.inRange(hsv, np.array(limiteJaune[0][0]), np.array(limiteJaune[0][1]))
 
     # Compter le nombre de pixels de chaque couleur
-    count_red = cv2.countNonZero(mask_red1) + cv2.countNonZero(mask_red2)
+    count_red = cv2.countNonZero(mask_red1) #+ cv2.countNonZero(mask_red2)
     count_green = cv2.countNonZero(mask_green)
     count_yellow = cv2.countNonZero(mask_yellow)
 
@@ -47,7 +47,4 @@ def detect_color():
     
     # Retourner la valeur correspondante
     return color_return_map[max_color[0]]
-
-if __name__ == "__main__":
-    detect_color()
 

@@ -15,6 +15,27 @@ import chiffre
 import fleche
 import rectangle
 
+def aruco_detect(input):
+    
+    if isinstance(input, str):
+        image = cv2.imread(input)
+    else:
+        image = input
+        
+    dictionnaire = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
+
+    # Récupérer la version d'OpenCV
+    version_opencv = list(map(int, cv2.__version__.split('.')[:2]))
+    # Créer les paramètres de détection en fonction de la version d'OpenCV
+    if version_opencv[0] > 4 or (version_opencv[0] == 4 and version_opencv[1] >= 7):
+        parametres = cv2.aruco.DetectorParameters()
+        coinsMarqueurs, idsMarqueur, _ = cv2.aruco.ArucoDetector(dictionnaire, parametres).detectMarkers(image)
+    else:
+        parametres = cv2.aruco.DetectorParameters_create()
+        coinsMarqueurs, idsMarqueur, _ = cv2.aruco.detectMarkers(image, dictionnaire, parameters=parametres)
+        
+    return coinsMarqueurs, idsMarqueur
+
 
 def detection(): 
     try:
@@ -27,10 +48,9 @@ def detection():
         #image = cv2.imread('Cours1 S2-20240228\\flecheAR.jpg')
         
         #!trouve 4 ARuco avec le même identifiant dans l’image, sinon renvoie une erreur
-        dictionnaire = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
-        parametres =  cv2.aruco.DetectorParameters()
-        coinsMarqueurs, idsMarqueur, PotentielsMarqueurs = cv2.aruco.ArucoDetector(dictionnaire, parametres).detectMarkers(cv2.imread('opencv1.png'))
-
+        # Initialisation de la détection des Arucos
+        coinsMarqueurs, idsMarqueur = aruco_detect("opencv1.png")
+        
         print("📡 Recherche des 4 ARuco avec le même identifiant ...")
         animation = "|||||/////-----\\\\\\"
         i = 0
@@ -40,13 +60,14 @@ def detection():
                 break
 
             x, image = camera.read()
-            coinsMarqueurs, idsMarqueur, PotentielsMarqueurs = cv2.aruco.ArucoDetector(dictionnaire, parametres).detectMarkers(image)
+            
+            coinsMarqueurs, idsMarqueur = aruco_detect(image)
             
 
             # Arrêt au bout de 10 secondes sans détection (une boucle dure environ 0.03s, donc 333 boucles ~= 10s)
             if i == 333:
                 print("🚫 Erreur : pas assez d'arucos détectés ou de même identifiant ! (Delay10sOutofBounds)")
-                exit()
+                return 0
 
             # Print the animation
             print(animation[i % len(animation)], end="\r")
@@ -89,8 +110,8 @@ def detection():
             tous_coins.append(coins)
             
         # afficher l'image
-        cv2.imshow("Détection des arucos sur l'image", image)
-        cv2.waitKey(0)
+        #cv2.imshow("Détection des arucos sur l'image", image)
+        #cv2.waitKey(0)
 
         #! Déformer l’image pour ne travailler que dans la zone d’intérêt définie par ces 4 marqueurs
         print("🔍 On zoom sur l'image dans la zone des 4 marqueurs")
@@ -103,7 +124,11 @@ def detection():
         bottom_left = np.array([top_left[0], bottom_right[1]])
 
         # On spécifie les coordonnées des coins de l'image zoomée, +30 Pixels pour enlever les arucos de la zone et ainsi éviter les erreurs avec GoodFeaturesToTrack
-        offset = 25
+        offset = 35
+        
+        if idsMarqueur[0] == 13:
+            offset = 25
+            
         points1 = np.float32([top_left + [offset, offset], top_right + [-offset, offset], bottom_right + [-offset, -offset], bottom_left + [offset, -offset]])
         points2 = np.float32([[0, 0], [200, 0], [200, 200], [0, 200]])
 
@@ -114,9 +139,9 @@ def detection():
         image_zoomee = cv2.warpPerspective(image, vecttrans, (200, 200))
 
         # On affiche l'image zoomée
-        cv2.imshow("Zoom sur la zone", image_zoomee)
+        #cv2.imshow("Zoom sur la zone", image_zoomee)
         cv2.imwrite('image_zoomee.png', image_zoomee)
-        cv2.waitKey(0)
+        #cv2.waitKey(0)
 
         #! Recherche d'une flèche dans l'image zoomée et détermination de son sens
         if idsMarqueur[0] == 8: #? L'ID des rectangles de couleur est 8
