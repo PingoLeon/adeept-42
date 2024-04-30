@@ -1,7 +1,7 @@
 import time
 import initservo as servo
 import sys
-sys.path.insert(0,'/home/pi/adeept-picar-b-gitless/server/')
+sys.path.insert(0,'/home/pi/adeept_picar-b/server/')
 import RPIservo
 
 
