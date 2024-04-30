@@ -1,9 +1,3 @@
-#!/usr/bin/python3
-# File name   : findline.py
-# Description : line tracking 
-# Website     : www.adeept.com
-# Author      : William
-# Date        : 2019/11/21
 import sys
 import time
 import cv2
@@ -11,11 +5,14 @@ import numpy as np
 
 sys.path.insert(0,'/home/pi/adeept_picar-b/server/')
 import RPi.GPIO as GPIO
+import time
 import GUImove as move
 import servo
 import LED
+import head
 import RGB
 import ultra
+import functions
 
 sys.path.insert(0,'/home/pi/adeept-42/2-S2/')
 import chiffre
@@ -23,7 +20,9 @@ import rectangle
 import fleche
 
 led = LED.LED()
-angle_rate = 0.5
+
+fuc = functions.Functions()
+fuc.start() 
 
 def setup():
     GPIO.setwarnings(False)
@@ -45,6 +44,38 @@ def checkdist_average():
     print("Average distance: %.2f cm" % average_distance)
     return average_distance
     
+def scan():
+    radar_send = fuc.radarScan()
+    distances_left = []
+    distances_right = []
+
+    # Calculer l'angle médian
+    min_angle = radar_send[0][1]
+    max_angle = radar_send[-1][1]
+    median_angle = (min_angle + max_angle) / 2
+
+    for i in range(len(radar_send)):
+        distance, angle = radar_send[i]
+        distance = round(distance * 100, 2)
+        if angle < median_angle:
+            distances_left.append(distance)
+        else:
+            distances_right.append(distance)
+
+    mean_distance_left = sum(distances_left) / len(distances_left) if distances_left else 0
+    mean_distance_right = sum(distances_right) / len(distances_right) if distances_right else 0
+
+    print("moyenne distance gauche : ", mean_distance_left)
+    print("moyenne distance droite : ", mean_distance_right)
+    if mean_distance_left > mean_distance_right:
+        print("🔜 La moyenne des distances est supérieure à gauche")
+        print("On va à gauche ! ⬅️")
+        return 2
+    else:
+        print("🔜 La moyenne des distances est supérieure à droite")
+        print("On va à droite ! ➡️")
+        return 1
+
 def checkcam():
     x, image = camera.read()
     cv2.imwrite("ARUCOTESTLABY.png",image)
@@ -135,7 +166,26 @@ def checkcam():
             print("on repart !")
         return sens_fleche
     
-def maze():
+#Avancer tant qu'aucun obstacle à 30cm
+def scenario_lab_scan():
+    while 1:
+        #On avance tout droit tant que rien à -20cm
+        while checkdist_average() > 30:
+            move.move(40, 'forward')
+            time.sleep(0.1)
+        stop_robot()
+        value_turn = scan()
+        move.move(60, 'backward')
+        time.sleep(0.5)
+        if value_turn == 1:
+            servo.turnRight(0.3)
+        elif value_turn == 2:
+            servo.turnLeft(0.3)
+        move.move(50, 'forward')
+        time.sleep(1)
+        servo.turnMiddle()
+
+def scenario_forward_with_img():
     value_turn = 0
     while 1:
         #avancer lentement
@@ -152,35 +202,45 @@ def maze():
             if sens_fleche is not None:
                 if sens_fleche == 4 and value_turn ==0:
                     print("🔜 On tourne à droite")
-                    servo.turnRight(angle_rate)
+                    servo.turnRight(0.3)
                     value_turn = 1
                 if sens_fleche == 5 and value_turn ==0:
                     print("🔜 On tourne à gauche")
-                    servo.turnLeft(angle_rate)
+                    servo.turnLeft(0.3)
                     value_turn = 2
                     time.sleep
         else:
             print("Distance > 50")
-            
-        
-        
     
 
 if __name__ == '__main__':
     try:
-        setup()
-        move.setup()
         global dictionnaire, camera, parametres
         parametres = cv2.aruco.DetectorParameters_create()
         dictionnaire = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
         camera = cv2.VideoCapture(0)
         
-        maze()
+        setup()
+        move.setup()
+        head.reset()
+        time.sleep(0.2)
+        
+        print("Quel scénario ?")
+        print("1 - Laby avec avancer / reculer et scanner \n2 - Avancer et vérifier si on voit un aruco en même temps")
+        choix = int(input("Votre choix : "))  # Convertir la chaîne de caractères en nombre
+        if choix == 1:
+            scenario_lab_scan()
+        elif choix == 2:
+            scenario_forward_with_img()
+        else: 
+            print("Mauvais choix 🥲")
+        
     except KeyboardInterrupt:
-        RGB.both_off()
+        head.reset_head()
+        move.destroy()
         led.colorWipe(0,0,0)
-        camera.release()
-        pass
+        RGB.both_off()
+    
     
 
         
