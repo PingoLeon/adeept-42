@@ -163,7 +163,7 @@ def checkcam():
         else:
             print("🚫 Rien de connu n'a été détecté...")
         if value_return is not None or sens_fleche is not None or chiffre is not None:
-            print("on repart !")
+            print("Let's go !")
         return sens_fleche
     
 #Avancer tant qu'aucun obstacle à 30cm
@@ -190,8 +190,7 @@ def scenario_forward_with_img():
     while 1:
         #avancer lentement
         if value_turn == 0:
-            move.move(40, 'forward')
-            time.sleep(0.2)
+            move.move(30, 'forward')
         
         #prendre une image en même temps et l'analyser et dire si on doit tourner à droite ou à gauche
         dist = checkdist_average()
@@ -204,11 +203,12 @@ def scenario_forward_with_img():
                     print("🔜 On tourne à droite")
                     servo.turnRight(0.3)
                     value_turn = 1
+                    return 0
                 if sens_fleche == 5 and value_turn ==0:
                     print("🔜 On tourne à gauche")
                     servo.turnLeft(0.3)
                     value_turn = 2
-                    time.sleep
+                    return 0
         else:
             print("Distance > 50")
     
@@ -223,18 +223,19 @@ if __name__ == '__main__':
         setup()
         move.setup()
         head.reset()
+        servo.turnMiddle()
         time.sleep(0.2)
         
         print("Quel scénario ?")
         print("1 - Laby avec avancer / reculer et scanner \n2 - Avancer et vérifier si on voit un aruco en même temps")
         choix = int(input("Votre choix : "))  # Convertir la chaîne de caractères en nombre
         if choix == 1:
-            scenario_lab_scan()
+            fin = scenario_lab_scan()
         elif choix == 2:
-            scenario_forward_with_img()
+            fin = scenario_forward_with_img()
         else: 
             print("Mauvais choix 🥲")
-        
+        print("Fin du prog !")
     except KeyboardInterrupt:
         head.reset_head()
         move.destroy()

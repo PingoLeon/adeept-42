@@ -207,7 +207,7 @@ if __name__ == '__main__':
             previous_move, number_of_tiret = run(previous_move, number_of_tiret)
         pass
     except KeyboardInterrupt:
-        head.reset_head()
+        head.reset()
         move.destroy()
         led.colorWipe(0,0,0)
         RGB.both_off()
