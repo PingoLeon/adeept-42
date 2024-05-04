@@ -189,6 +189,10 @@ if __name__ == '__main__':
             try:
                 previous_move = run(previous_move)
             except LabyrintheModeException as e:
+                robot.stop()
+                robot.destroy()
+                sensors.destroy()
+                
                 labyrinthe.labyrinthe(e.value)
                 os._exit(0)
         pass

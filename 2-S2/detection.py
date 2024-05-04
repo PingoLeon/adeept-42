@@ -1,11 +1,8 @@
-from tkinter import image_types
 import numpy as np
 import sys
 import cv2
 import time
-import chiffre
-import fleche
-import rectangle
+import detection_class
 
 count_recursivite = 0
 
@@ -123,17 +120,17 @@ def detection(count_recursivite = 0):
         #! Recherche d'une flèche dans l'image zoomée et détermination de son sens
         if idsMarqueur[0] == 8: #? L'ID des rectangles de couleur est 8
             print("🤔 Il devrait y avoir un rectangle de couleur dans la zone zoomée")
-            value_return = rectangle.detect_color(image_zoomee) 
+            value_return = detection_class.Detection.rectangle(image_zoomee) 
             return value_return #! 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
         
         elif idsMarqueur[0] == 13: #? L'ID de la flèche est 13
             print("🔍 On recherche une flèche dans l'image zoomée")
-            sens_fleche = fleche.detect_fleche(image_zoomee)
+            sens_fleche = detection_class.Detection.fleche(image_zoomee)
             return sens_fleche  #! 4 --> Droite / 5 --> Gauche
         
         elif idsMarqueur[0] == 9: #? L'ID des chiffres est 9
             print("🔢 On va essayer de voir si y'a un chiffre dans l'image")
-            chiffre_return = chiffre.detect_chiffre(image_zoomee) # 0 --> rien détecté / 1 --> Chiffre détecté et mis dans le terminal
+            chiffre_return = detection_class.Detection.chiffre(image_zoomee) # 0 --> rien détecté / 1 --> Chiffre détecté et mis dans le terminal
             
             if chiffre_return == 0:
                 print("♻️ On relance un cycle ! -> ",count_recursivite)

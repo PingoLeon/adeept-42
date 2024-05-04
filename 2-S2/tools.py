@@ -1,6 +1,7 @@
 import sys
 import cv2
 import numpy as np
+import detection_class
 
 sys.path.insert(0,'/home/pi/adeept-42/2-S2/')
 import chiffre
@@ -137,16 +138,20 @@ class Sensors:
         
         sens_fleche = None
         chiffre = None
-        #! Recherche d'une flèche dans l'image zoomée et détermination de son sens
         if idsMarqueur[0] == 8: #? L'ID des rectangles de couleur est 8
             print("🤔 Il devrait y avoir un rectangle de couleur dans la zone zoomée")
-            rectangle.detect_color(image_zoomee) 
-        elif idsMarqueur[0] == 9: #? L'ID des chiffres est 9
-            print("🔢 On va essayer de voir si y'a un chiffre dans l'image")
-            chiffre.detect_chiffre(image_zoomee)
+            value_return = detection_class.Detection.rectangle(image_zoomee) 
+            return value_return #! 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
+        
         elif idsMarqueur[0] == 13: #? L'ID de la flèche est 13
             print("🔍 On recherche une flèche dans l'image zoomée")
-            sens_fleche = fleche.detect_fleche(image_zoomee)
+            sens_fleche = detection_class.Detection.fleche(image_zoomee)
+            return sens_fleche  #! 4 --> Droite / 5 --> Gauche
+        
+        elif idsMarqueur[0] == 9: #? L'ID des chiffres est 9
+            print("🔢 On va essayer de voir si y'a un chiffre dans l'image")
+            chiffre_return = detection_class.Detection.chiffre(image_zoomee) # 0 --> rien détecté / 1 --> Chiffre détecté et mis dans le terminal
+            return 6 #! 6 --> Chiffre détecté
         else:
             print("🚫 Rien de connu n'a été détecté...")
-        return sens_fleche
+            return 0
