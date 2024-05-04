@@ -32,13 +32,14 @@ def detect_color(image):
     # Créer un dictionnaire pour mapper les noms de couleur aux valeurs de retour
     color_return_map = {
         "red": 1,
-        "green": 2,
-        "yellow": 3
+        "yellow": 2,
+        "green": 3,
+        
     }
     
     # Trouver la couleur avec le plus grand nombre de pixels
     max_color = max([("red", count_red), ("green", count_green), ("yellow", count_yellow)], key=lambda x: x[1])
 
     # Retourner la valeur correspondante
-    return color_return_map[max_color[0]]
+    return color_return_map[max_color[0]] 
 

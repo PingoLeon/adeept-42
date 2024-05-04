@@ -28,7 +28,7 @@ def aruco_detect(input):
     return coinsMarqueurs, idsMarqueur
 
 
-def detection(count_recursivite): 
+def detection(count_recursivite = 0): 
     try:
         #! Prendre une photo depuis la webcam
         camera = cv2.VideoCapture(0)
@@ -66,8 +66,6 @@ def detection(count_recursivite):
         
         #Fermer la caméra :
         camera.release()
-
-
 
         #? Afficher les coins des arucos détectés
         ids = idsMarqueur.flatten()	
@@ -126,14 +124,17 @@ def detection(count_recursivite):
         if idsMarqueur[0] == 8: #? L'ID des rectangles de couleur est 8
             print("🤔 Il devrait y avoir un rectangle de couleur dans la zone zoomée")
             value_return = rectangle.detect_color(image_zoomee) 
-            return value_return # 0 --> rien détecté / 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
+            return value_return #! 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
+        
         elif idsMarqueur[0] == 13: #? L'ID de la flèche est 13
             print("🔍 On recherche une flèche dans l'image zoomée")
             sens_fleche = fleche.detect_fleche(image_zoomee)
-            return sens_fleche  # 0 --> rien détecté / 4 --> Droite / 5 --> Gauche
+            return sens_fleche  #! 4 --> Droite / 5 --> Gauche
+        
         elif idsMarqueur[0] == 9: #? L'ID des chiffres est 9
             print("🔢 On va essayer de voir si y'a un chiffre dans l'image")
             chiffre_return = chiffre.detect_chiffre(image_zoomee) # 0 --> rien détecté / 1 --> Chiffre détecté et mis dans le terminal
+            
             if chiffre_return == 0:
                 print("♻️ On relance un cycle ! -> ",count_recursivite)
                 if count_recursivite >= 15:
@@ -141,12 +142,14 @@ def detection(count_recursivite):
                     return 0
                 count_recursivite += 1
                 detection(count_recursivite)
+            return 6 #! 6 --> Chiffre détecté
         else:
             print("🚫 Rien de connu n'a été détecté...")
+            return 0
             
     except Exception as e:
         print("🚫 Erreur :", e)
         
 
 if __name__ == "__main__":
-    detection(count_recursivite)
+    detection()

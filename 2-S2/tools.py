@@ -13,133 +13,140 @@ import RPi.GPIO as GPIO
 import GUImove as move
 import servo
 import LED
-import head
 import RGB
 import ultra
+import RPIservo
+import Adafruit_PCA9685
 
-
-
-led = LED.LED()
-led_ctrl = LED.LED_ctrl()
-
-def setup():
-    GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(19,GPIO.IN)
-    GPIO.setup(16,GPIO.IN)
-    GPIO.setup(20,GPIO.IN)
-    RGB.setup()
+class Robot:
+    def __init__(self, move, servo):
+        self.head = RPIservo.ServoCtrl()
+        self.head.start()
+        self.move = move
+        self.servo = servo
+        self.led = LED.LED()
+        self.led_ctrl = LED.LED_ctrl()
     
-def stop_program():
-    move.motorStop()       # Arrête les moteurs
-    move.move(0, 'stop')  # Arrête le mouvement du robot
-    head.reset()
-    servo.turnMiddle()     # Centre le servo (arrête le virage)
-    RGB.both_off()
-    led.colorWipe(0,0,0)
-    led_ctrl.stop()
+    def setup(self):
+        GPIO.setwarnings(False)
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(19, GPIO.IN)
+        GPIO.setup(16, GPIO.IN)
+        GPIO.setup(20, GPIO.IN)
+        RGB.setup()
 
-def checkdist_average():
-    distance_list = []
-    while len(distance_list) < 5:
-        distance = ultra.checkdist() * 100
-        distance_list.append(distance)
+    def reset_head(self):
+        pwm = Adafruit_PCA9685.PCA9685()
+        pwm.set_pwm_freq(50)
+        x = 0
+        while x < 16:
+            pwm.set_all_pwm(0, 300)
+            x += 1
+
+    def tilt_head_right(self):
+        self.head.moveAngle(1, -45)
+
+    def tilt_head_left(self):
+        self.head.moveAngle(1, 45)
+
+    def stop(self):
+        self.move.move(0, 'stop')
+        self.move.motorStop()
+        self.servo.turnMiddle()
+        self.reset_head()
     
-    average_distance = sum(distance_list) / len(distance_list)
-    #print("📡 %.2f cm" % average_distance)
-    return average_distance
-
-def stop_robot():
-    move.motorStop()
-    head.reset()
-    move.move(0, 'stop') 
-    servo.turnMiddle()     
-
-def checkcamlaby():
-    global dictionnaire, camera, parametres
-    parametres = cv2.aruco.DetectorParameters_create()
-    dictionnaire = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
-    camera = cv2.VideoCapture(0)
+    def destroy(self):
+        self.stop()
+        self.move.destroy()
+        self.servo.turnMiddle()
+        self.led_ctrl.destroy()
+        RGB.both_off()
+        self.led.colorWipe(0, 0, 0)
+        self.led_ctrl.stop()
     
-    x, image = camera.read()
-    camera.release()
-    cv2.imwrite("imageInitiale.png",image)
-    coinsMarqueurs, idsMarqueur, _ = cv2.aruco.detectMarkers(image, dictionnaire, parameters=parametres)
-    if idsMarqueur is not None and len(coinsMarqueurs) == 4 and len(set(idsMarqueur.flatten())) == 1:
-        stop_robot()
-        print("✅ 4 Arucos avec le même identifiant trouvés !")
+    def set_led_back(self, r, g, b):
+        self.led.colorWipe(r, g, b)
+    
+    def set_led_front(self, color):
+        if color == None:
+            self.RGB.both_off()
+        elif color == "red":
+            self.RGB.red()
+        elif color == "green":
+            self.RGB.green()
+        elif color == "yellow":
+            self.RGB.yellow()
         
-        #? Afficher les coins des arucos détectés
+class Sensors:
+    def __init__(self, robot):
+        self.robot = robot
+        self.camera = cv2.VideoCapture(0)
+        self.parametres = cv2.aruco.DetectorParameters_create()
+        self.dictionnaire = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
+
+    def check_distance_average(self):
+        distance_list = []
+        for _ in range(5):
+            distance = ultra.checkdist() * 100  # Convertir en cm
+            distance_list.append(distance)
+        average_distance = sum(distance_list) / len(distance_list)
+        return average_distance
+
+    def release_resources(self):
+        self.camera.release()
+
+    def take_image(self):
+        x, image = self.camera.read()
+        self.release_resources()
+        cv2.imwrite("imageInitiale.png", image)
+        coinsMarqueurs, idsMarqueur, _ = cv2.aruco.detectMarkers(image, self.dictionnaire, parameters=self.parametres)
+        if idsMarqueur is not None and len(coinsMarqueurs) == 4 and len(set(idsMarqueur.flatten())) == 1:
+            self.robot.stop()  # Utiliser l'instance de Robot stockée
+            sens_fleche = self.zoomIn(image, coinsMarqueurs, idsMarqueur)
+            return sens_fleche
+        else:
+            return None
+    
+
+    def zoomIn(self, image, coinsMarqueurs, idsMarqueur):
+        print("✅ 4 Arucos avec le même identifiant trouvés !")
         ids = idsMarqueur.flatten()	
         tous_coins = []
         image_marquee = image
         for (coinMarqueur, idMarqueur) in zip(coinsMarqueurs, ids):
-            # extraire les angles des aruco (toujours dans l'ordre haut-gauche, haut-droite, bas-gauche, bas-droit)
             coins = coinMarqueur.reshape((4, 2))
-            (topLeft, topRight, bottomRight, bottomLeft) = coins
-            # convertir en entier (pour l'affichage)
-            topRight = (int(topRight[0]), int(topRight[1]))
-            bottomRight = (int(bottomRight[0]), int(bottomRight[1]))
-            bottomLeft = (int(bottomLeft[0]), int(bottomLeft[1]))
-            topLeft = (int(topLeft[0]), int(topLeft[1]))
-            
-            # dessiner un quadrilatère autour de chaque aruco
-            cv2.line(image_marquee, topLeft, topRight, (0, 255, 0), 2)
-            cv2.line(image_marquee, topRight, bottomRight, (0, 255, 0), 2)
-            cv2.line(image_marquee, bottomRight, bottomLeft, (0, 255, 0), 2)
-            cv2.line(image_marquee, bottomLeft, topLeft, (0, 255, 0), 2)
-            # calculer puis afficher un point rouge au centre
-            cX = int((topLeft[0] + bottomRight[0]) / 2.0)
-            cY = int((topLeft[1] + bottomRight[1]) / 2.0)
-            cv2.circle(image_marquee, (cX, cY), 4, (0, 0, 255), -1)
-            # affiher l'identifiant
-            cv2.putText(image_marquee, str(idMarqueur),
-                (topLeft[0], topLeft[1] - 15), cv2.FONT_HERSHEY_SIMPLEX,
-                0.5, (0, 255, 0), 2)
-            
             tous_coins.append(coins)
-        cv2.imwrite('ArucosDétectés.png', image_marquee)
 
-        #! Déformer l’image pour ne travailler que dans la zone d’intérêt définie par ces 4 marqueurs
         print("🔍 On zoom sur l'image dans la zone des 4 marqueurs")
         tous_coins = np.concatenate(tous_coins)
-        # On calcule les coordonnées des coins de l'image zoomée
         top_left = np.min(tous_coins, axis=0)
         bottom_right = np.max(tous_coins, axis=0)
         top_right = np.array([bottom_right[0], top_left[1]])
         bottom_left = np.array([top_left[0], bottom_right[1]])
 
-        # On spécifie les coordonnées des coins de l'image zoomée, +30 Pixels pour enlever les arucos de la zone et ainsi éviter les erreurs avec GoodFeaturesToTrack
         offset = 35
-        
         if idsMarqueur[0] == 13:
             offset = 15
             
         points1 = np.float32([top_left + [offset, offset], top_right + [-offset, offset], bottom_right + [-offset, -offset], bottom_left + [offset, -offset]])
         points2 = np.float32([[0, 0], [200, 0], [200, 200], [0, 200]])
 
-        # On calcule la matrice de transformation
         vecttrans = cv2.getPerspectiveTransform(points1, points2)
-
-        #! On applique la transformation à l'image d'origine
         image_zoomee = cv2.warpPerspective(image, vecttrans, (200, 200))
         cv2.imwrite('image_zoomee.png', image_zoomee)
         
-        value_return = None
         sens_fleche = None
         chiffre = None
         #! Recherche d'une flèche dans l'image zoomée et détermination de son sens
         if idsMarqueur[0] == 8: #? L'ID des rectangles de couleur est 8
             print("🤔 Il devrait y avoir un rectangle de couleur dans la zone zoomée")
             rectangle.detect_color(image_zoomee) 
+        elif idsMarqueur[0] == 9: #? L'ID des chiffres est 9
+            print("🔢 On va essayer de voir si y'a un chiffre dans l'image")
+            chiffre.detect_chiffre(image_zoomee)
         elif idsMarqueur[0] == 13: #? L'ID de la flèche est 13
             print("🔍 On recherche une flèche dans l'image zoomée")
             sens_fleche = fleche.detect_fleche(image_zoomee)
-        elif idsMarqueur[0] == 9: #? L'ID des chiffres est 9
-            print("🔢 On va essayer de voir si y'a un chiffre dans l'image")
-            chiffre.detect_chiffre(image_zoomee) # 0 --> rien détecté / 1 --> Chiffre détecté et mis dans le terminal
         else:
             print("🚫 Rien de connu n'a été détecté...")
         return sens_fleche
-    else:
-        return None
