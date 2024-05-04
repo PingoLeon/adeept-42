@@ -43,7 +43,7 @@ def detect_color():
     max_color = max([("red", count_red), ("green", count_green), ("yellow", count_yellow)], key=lambda x: x[1])
     
     # Afficher la couleur avec l'emoji approprié
-    print(color_emoji_map[max_color[0]], max_color[0])
+    #print(color_emoji_map[max_color[0]], max_color[0])
     
     # Retourner la valeur correspondante
     return color_return_map[max_color[0]]

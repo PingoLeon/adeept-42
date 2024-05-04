@@ -56,8 +56,8 @@ def detection():
             
 
             # Arrêt au bout de 10 secondes sans détection (une boucle dure environ 0.03s, donc 333 boucles ~= 10s)
-            if i == 333:
-                print("🚫 Erreur : pas assez d'arucos détectés ou de même identifiant ! (Delay10sOutofBounds)")
+            if i == 99:
+                print("🚫 Erreur : pas assez d'arucos détectés ou de même identifiant ! (Delay3sOutofBounds)")
                 return 0
 
             # Print the animation
@@ -121,7 +121,7 @@ def detection():
         offset = 35
         
         if idsMarqueur[0] == 13:
-            offset = 25
+            offset = 30
             
         points1 = np.float32([top_left + [offset, offset], top_right + [-offset, offset], bottom_right + [-offset, -offset], bottom_left + [offset, -offset]])
         points2 = np.float32([[0, 0], [200, 0], [200, 200], [0, 200]])
