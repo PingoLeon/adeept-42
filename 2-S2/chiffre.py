@@ -68,12 +68,8 @@ def detect_chiffre():
     if tuple(on) not in correspondances:
         print("🚫 Aucun chiffre trouvé")
         print("🤔 On a tenté de rechercher le chiffre : ",on)
-        #cv2.imshow('Zones trouvées', image)  
-        #cv2.waitKey(0)
         return 0
     else:
         nombrelu = correspondances[tuple(on)]
         print("✅ On a trouvé le chiffre : ", nombrelu)
-        #cv2.imshow('Zones trouvées', image)  
-        #cv2.waitKey(0)
         return 1

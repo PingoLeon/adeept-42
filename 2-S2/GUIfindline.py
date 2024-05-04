@@ -13,13 +13,7 @@ import LED
 import head
 import RGB
 
-line_pin_right = 19
-line_pin_middle = 16
-line_pin_left = 20
 
-led = LED.LED()
-led_ctrl = LED.LED_ctrl()
-turn_status = 0
 #old speeds and angle (slow)
 #speed = 55
 #angle_rate = 0.2
@@ -32,24 +26,11 @@ check_true_out = 0
 backing = 0
 dist_to_check_max = 50
 last_turn = 0
+turn_status = 0
 
-def setup():
-    GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(line_pin_right,GPIO.IN)
-    GPIO.setup(line_pin_middle,GPIO.IN)
-    GPIO.setup(line_pin_left,GPIO.IN)
-    RGB.setup()
-    
-def stop_program():
-    move.motorStop()       # Arrête les moteurs
-    move.move(0, 'stop')  # Arrête le mouvement du robot
-    head.reset()
-    servo.turnMiddle()     # Centre le servo (arrête le virage)
-    RGB.both_off()
-    led.colorWipe(0,0,0)
-    led_ctrl.stop()
-    
+led = LED.LED()
+led_ctrl = LED.LED_ctrl()
+
 
 def stop_robot():
     move.motorStop()       # Arrête les moteurs
@@ -65,6 +46,7 @@ def behavior(value_return):
         led.colorWipe(255,0,0)
         time.sleep(10)
         print("\n🔃On repart !")
+        return 1
 
     elif value_return == 2:
         print("\n🟢 Un panneau vert a été détecté ! 🟢\n")
@@ -72,6 +54,7 @@ def behavior(value_return):
         RGB.both_off()
         RGB.green()
         led.colorWipe(0,255,0)
+        return 1
 
     elif value_return == 3:
         print("\n🟡 Un panneau jaune a été détecté ! 🟡 \n")
@@ -79,15 +62,17 @@ def behavior(value_return):
         RGB.both_off()
         RGB.yellow()
         led.colorWipe(0,255,255)
+        return 1
         
     elif value_return == 4 or value_return == 5:
         print("\n🤠 MODE LABYRINTHE 🤠\n")
         head.reset()
-        labyrinthe()
+        return value_return
         
     else:
         print("\n✅ On continue, aucun panneau de couleur n'a été repéré !\n")
         head.reset()
+        return 1
 
 
 def checkcam():
@@ -132,25 +117,33 @@ def checkcam():
                 print("🛑 Aucun panneau détecté nulle part")
                 return 0
             else:
-                behavior(value_return)
+                value_return = behavior(value_return)
+                if value_return != 1:
+                    return value_return
                 return 1
         else:
             behavior(value_return)
+            if value_return != 1:
+                return value_return
             return 1
     else:
         behavior(value_return)
+        if value_return != 1:
+                return value_return
         return 1
 
 def run(previous_move):
     global turn_status, speed, angle_rate, color_select, led, check_true_out, backing, last_turn
-    status_right = GPIO.input(line_pin_right)
-    status_middle = GPIO.input(line_pin_middle)
-    status_left = GPIO.input(line_pin_left)
+    status_right = GPIO.input(19)
+    status_middle = GPIO.input(16)
+    status_left = GPIO.input(20)
 
     if status_right == 1 and status_middle == 1 and status_left == 1 and previous_move != "Camera":
         stop_robot()
         head.reset()
-        checkcam()
+        value_return = checkcam()
+        if value_return != 1:
+            return str(value_return)
         time.sleep(2)
         move.move(60, 'forward')
         time.sleep(0.5)
@@ -225,20 +218,21 @@ def run(previous_move):
 
 if __name__ == '__main__':
     try:
-        setup()
-        move.setup()
+        tools.setup()
+        move.setup(),
         
         stop_robot()
         head.reset()
         
         previous_move = ""
         time.sleep(0.2)
+        liste_action = ["Back","Middle","Right","Left","Camera"]
 
         while 1:
             previous_move = run(previous_move)
+            if previous_move not in liste_action:
+                labyrinthe(int(previous_move))
+                OS._exit(0)
         pass
     except KeyboardInterrupt:
-        head.reset()
-        move.destroy()
-        led.colorWipe(0,0,0)
-        RGB.both_off()
+        tools.stop_program()

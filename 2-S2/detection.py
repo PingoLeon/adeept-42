@@ -56,7 +56,7 @@ def detection():
             
 
             # Arrêt au bout de 10 secondes sans détection (une boucle dure environ 0.03s, donc 333 boucles ~= 10s)
-            if i == 99:
+            if i == 50:
                 print("🚫 Erreur : pas assez d'arucos détectés ou de même identifiant ! (Delay3sOutofBounds)")
                 return 0
 
