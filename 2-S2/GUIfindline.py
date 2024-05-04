@@ -115,7 +115,7 @@ def checkcam():
                 value_return = 0
             if value_return == 0:
                 print("🛑 Aucun panneau détecté nulle part")
-                return 0
+                return 1
             else:
                 value_return = behavior(value_return)
                 if value_return != 1:
