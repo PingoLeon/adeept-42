@@ -86,7 +86,7 @@ def checkcam():
     print("👁️ On regarde à droite")
     distance = tools.checkdist_average()
     if distance <= dist_to_check_max :
-        value_return = detection() # 0 --> aucun panneau détecté / 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
+        value_return = detection(0) # 0 --> aucun panneau détecté / 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
     else:
         print("❗Trop loing")
         value_return = 0
@@ -97,7 +97,7 @@ def checkcam():
         print("👁️ On regarde à gauche")
         distance = tools.checkdist_average()
         if distance <= dist_to_check_max :
-            value_return = detection() # 0 --> aucun panneau détecté / 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
+            value_return = detection(0) # 0 --> aucun panneau détecté / 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
         else:
             print("❗Trop loing")
             value_return = 0
@@ -109,7 +109,7 @@ def checkcam():
             print("👁️ On regarde tout droit")
             distance = tools.checkdist_average()
             if distance <= dist_to_check_max :
-                value_return = detection() # 0 --> aucun panneau détecté / 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
+                value_return = detection(0) # 0 --> aucun panneau détecté / 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
             else:
                 print("❗Trop loing")
                 value_return = 0
