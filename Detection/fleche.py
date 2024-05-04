@@ -39,16 +39,16 @@ def detect_fleche():
         print('Droite ➡️')
         
         #les prochaines lignes ne servent qu'à l'affichage graphique
-        cv2.imshow('Flèche trouvée !',img)
-        cv2.waitKey(0)
+        #cv2.imshow('Flèche trouvée !',img)
+        #cv2.waitKey(0)
         
         return 4
     else:
         print('Gauche ⬅️')
         
         #les prochaines lignes ne servent qu'à l'affichage graphique
-        cv2.imshow('Flèche trouvée !',img)
-        cv2.waitKey(0)
+        #cv2.imshow('Flèche trouvée !',img)
+        #cv2.waitKey(0)
         
         return 5
 

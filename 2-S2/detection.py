@@ -1,12 +1,3 @@
-"""
-#! Algorithme par Léon Dalle - 06/03/2024
-#? Utilisation de certaines portions de codes qui étaient fournies via BoostCamp (Auteur présumé : Romaric Sichler)
-
-#*Nota Bene : Le code fonctionne bien pour la détection des flèches, quasi tout les essais sont concluants (Aruco 13)
-#*            Mais la détection de l'Aruco 8 pour les rectangles de couleur est beaucoup plus aléatoire, surtout s'il faut repérer 3 arucos sur une même frame.
-#*            Possibilité de changer l'aruco par un autre plus facilement détectable ?
-"""
-
 import numpy as np
 import sys
 import cv2
@@ -76,6 +67,9 @@ def detection():
             time.sleep(0.01)
         print('\r' + ' ' * len(animation) + '\r', end='')
         print("✅ 4 Arucos avec le même identifiant trouvés !")
+        
+        #Fermer la caméra :
+        camera.release()
 
 
 
@@ -154,7 +148,10 @@ def detection():
             return sens_fleche  # 0 --> rien détecté / 4 --> Droite / 5 --> Gauche
         elif idsMarqueur[0] == 9: #? L'ID des chiffres est 9
             print("🔢 On va essayer de voir si y'a un chiffre dans l'image")
-            chiffre.detect_chiffre() # 0 --> rien détecté / 1 --> Chiffre détecté et mis dans le terminal
+            chiffre_return = chiffre.detect_chiffre() # 0 --> rien détecté / 1 --> Chiffre détecté et mis dans le terminal
+            if chiffre_return == 0:
+                print("♻️ On relance un cycle !")
+                detection()
         else:
             print("🚫 Rien de connu n'a été détecté...")
             

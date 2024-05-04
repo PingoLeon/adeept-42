@@ -67,7 +67,7 @@ def detect_chiffre():
     #finalement on va chercher dans le dictinnaire du début quel est le chiffre lu
     if tuple(on) not in correspondances:
         print("🚫 Aucun chiffre trouvé")
-        print("On a tenté de rechercher le chiffre : ",on)
+        print("🤔 On a tenté de rechercher le chiffre : ",on)
         #cv2.imshow('Zones trouvées', image)  
         #cv2.waitKey(0)
         return 0
