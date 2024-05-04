@@ -7,10 +7,7 @@ limite2Rouge = [([0,100,100],[9,255,255])]
 limiteVert = [([40, 100, 100], [80, 255, 255])]
 limiteJaune = [([20, 100, 100], [42, 255, 255])]
 
-def detect_color():
-    
-    image = cv2.imread('image_zoomee.png')
-    
+def detect_color(image):
     # Convertir l'image en HSV
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
@@ -41,10 +38,7 @@ def detect_color():
     
     # Trouver la couleur avec le plus grand nombre de pixels
     max_color = max([("red", count_red), ("green", count_green), ("yellow", count_yellow)], key=lambda x: x[1])
-    
-    # Afficher la couleur avec l'emoji approprié
-    #print(color_emoji_map[max_color[0]], max_color[0])
-    
+
     # Retourner la valeur correspondante
     return color_return_map[max_color[0]]
 

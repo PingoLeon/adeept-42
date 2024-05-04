@@ -63,15 +63,16 @@ def checkcamlaby():
     
     x, image = camera.read()
     camera.release()
-    cv2.imwrite("ARUCOTESTLABY.png",image)
+    cv2.imwrite("imageInitiale.png",image)
     coinsMarqueurs, idsMarqueur, _ = cv2.aruco.detectMarkers(image, dictionnaire, parameters=parametres)
     if idsMarqueur is not None and len(coinsMarqueurs) == 4 and len(set(idsMarqueur.flatten())) == 1:
         stop_robot()
         print("✅ 4 Arucos avec le même identifiant trouvés !")
+        
         #? Afficher les coins des arucos détectés
         ids = idsMarqueur.flatten()	
-        image = cv2.imread('ARUCOTESTLABY.png')
         tous_coins = []
+        image_marquee = image
         for (coinMarqueur, idMarqueur) in zip(coinsMarqueurs, ids):
             # extraire les angles des aruco (toujours dans l'ordre haut-gauche, haut-droite, bas-gauche, bas-droit)
             coins = coinMarqueur.reshape((4, 2))
@@ -83,25 +84,24 @@ def checkcamlaby():
             topLeft = (int(topLeft[0]), int(topLeft[1]))
             
             # dessiner un quadrilatère autour de chaque aruco
-            cv2.line(image, topLeft, topRight, (0, 255, 0), 2)
-            cv2.line(image, topRight, bottomRight, (0, 255, 0), 2)
-            cv2.line(image, bottomRight, bottomLeft, (0, 255, 0), 2)
-            cv2.line(image, bottomLeft, topLeft, (0, 255, 0), 2)
+            cv2.line(image_marquee, topLeft, topRight, (0, 255, 0), 2)
+            cv2.line(image_marquee, topRight, bottomRight, (0, 255, 0), 2)
+            cv2.line(image_marquee, bottomRight, bottomLeft, (0, 255, 0), 2)
+            cv2.line(image_marquee, bottomLeft, topLeft, (0, 255, 0), 2)
             # calculer puis afficher un point rouge au centre
             cX = int((topLeft[0] + bottomRight[0]) / 2.0)
             cY = int((topLeft[1] + bottomRight[1]) / 2.0)
-            cv2.circle(image, (cX, cY), 4, (0, 0, 255), -1)
+            cv2.circle(image_marquee, (cX, cY), 4, (0, 0, 255), -1)
             # affiher l'identifiant
-            cv2.putText(image, str(idMarqueur),
+            cv2.putText(image_marquee, str(idMarqueur),
                 (topLeft[0], topLeft[1] - 15), cv2.FONT_HERSHEY_SIMPLEX,
                 0.5, (0, 255, 0), 2)
             
             tous_coins.append(coins)
-        cv2.imwrite("ArucoOnImage.png", image)
+        cv2.imwrite('ArucosDétectés.png', image_marquee)
 
         #! Déformer l’image pour ne travailler que dans la zone d’intérêt définie par ces 4 marqueurs
         print("🔍 On zoom sur l'image dans la zone des 4 marqueurs")
-        image = cv2.imread('ARUCOTESTLABY.png')
         tous_coins = np.concatenate(tous_coins)
         # On calcule les coordonnées des coins de l'image zoomée
         top_left = np.min(tous_coins, axis=0)
@@ -123,11 +123,7 @@ def checkcamlaby():
 
         #! On applique la transformation à l'image d'origine
         image_zoomee = cv2.warpPerspective(image, vecttrans, (200, 200))
-
-        # On affiche l'image zoomée
-        #cv2.imshow("Zoom sur la zone", image_zoomee)
         cv2.imwrite('image_zoomee.png', image_zoomee)
-        #cv2.waitKey(0)
         
         value_return = None
         sens_fleche = None
@@ -135,13 +131,13 @@ def checkcamlaby():
         #! Recherche d'une flèche dans l'image zoomée et détermination de son sens
         if idsMarqueur[0] == 8: #? L'ID des rectangles de couleur est 8
             print("🤔 Il devrait y avoir un rectangle de couleur dans la zone zoomée")
-            rectangle.detect_color() 
+            rectangle.detect_color(image_zoomee) 
         elif idsMarqueur[0] == 13: #? L'ID de la flèche est 13
             print("🔍 On recherche une flèche dans l'image zoomée")
-            sens_fleche = fleche.detect_fleche()
+            sens_fleche = fleche.detect_fleche(image_zoomee)
         elif idsMarqueur[0] == 9: #? L'ID des chiffres est 9
             print("🔢 On va essayer de voir si y'a un chiffre dans l'image")
-            chiffre.detect_chiffre() # 0 --> rien détecté / 1 --> Chiffre détecté et mis dans le terminal
+            chiffre.detect_chiffre(image_zoomee) # 0 --> rien détecté / 1 --> Chiffre détecté et mis dans le terminal
         else:
             print("🚫 Rien de connu n'a été détecté...")
         return sens_fleche

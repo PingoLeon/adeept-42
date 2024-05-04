@@ -1,8 +1,7 @@
 import numpy as np
 import cv2
 
-def detect_chiffre():
-    image = cv2.imread("image_zoomee.png")
+def detect_chiffre(image):
     
     #Dictionnaire de correspondance
     correspondances = {
@@ -63,6 +62,8 @@ def detect_chiffre():
         if on[i]==1:
             milsegement=(int((segments[i][0][0]+segments[i][1][0])/2),int((segments[i][0][1]+segments[i][1][1])/2))
             cv2.putText(image, str("X"), milsegement, cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+    
+    cv2.imwrite('ChiffreOutput.png', image)
 
     #finalement on va chercher dans le dictinnaire du début quel est le chiffre lu
     if tuple(on) not in correspondances:
