@@ -67,28 +67,31 @@ def checkcam():
     
     robot.tilt_head_right()
     print("👁️ On regarde à droite")
+    time.sleep(0.5)
     if sensors.check_distance_average() <= dist_to_check_max :
-        value_return = detection.detection() # 0 --> aucun panneau détecté / 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
-    else:
-        print("❗Trop loing")
+        value_return = detection.detection() # 0 --> aucun panneau détecté / 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune    else:
+        print("❗ Trop loing : ", round(sensors.check_distance_average(),2))
     
     if value_return == 0:
         print("🛑 Aucun panneau détecté à droite")
         robot.tilt_head_left()
         print("👁️ On regarde à gauche")
+        time.sleep(0.5)
         if sensors.check_distance_average() <= dist_to_check_max :
             value_return = detection.detection() # 0 --> aucun panneau détecté / 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
         else:
-            print("❗Trop loing")
+            print("❗ Trop loing : ", round(sensors.check_distance_average(),2))
+    
                 
     if value_return == 0:
         print("🛑 Aucun panneau détecté à gauche")
         robot.reset_head()
         print("👁️ On regarde tout droit")
+        time.sleep(0.5)
         if sensors.check_distance_average() <= dist_to_check_max :
             value_return = detection.detection()
         else:
-            print("❗Trop loing")
+            print("❗ Trop loing : ", round(sensors.check_distance_average(),2))
     
     if value_return == 0:
         print("🛑 Aucun panneau détecté nulle part")
@@ -176,7 +179,7 @@ if __name__ == '__main__':
         #! Setup
         move.setup()
         robot = tools.Robot(move, servo)
-        sensors = tools.Sensors()
+        sensors = tools.Sensors(robot)
         robot.setup()
         
         
@@ -190,11 +193,8 @@ if __name__ == '__main__':
                 previous_move = run(previous_move)
             except LabyrintheModeException as e:
                 robot.stop()
-                robot.destroy()
-                sensors.destroy()
                 
                 labyrinthe.labyrinthe(e.value)
-                os._exit(0)
         pass
     except KeyboardInterrupt:
         robot.stop()

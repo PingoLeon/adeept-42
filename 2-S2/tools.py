@@ -3,12 +3,6 @@ import cv2
 import numpy as np
 import detection_class
 
-sys.path.insert(0,'/home/pi/adeept-42/2-S2/')
-import chiffre
-import rectangle
-import fleche
-import head
-
 sys.path.insert(0,'/home/pi/adeept_picar-b/server/')
 import RPi.GPIO as GPIO
 import GUImove as move
@@ -27,6 +21,7 @@ class Robot:
         self.servo = servo
         self.led = LED.LED()
         self.led_ctrl = LED.LED_ctrl()
+        self.RGB = RGB
     
     def setup(self):
         GPIO.setwarnings(False)
@@ -59,7 +54,6 @@ class Robot:
     def destroy(self):
         self.stop()
         self.move.destroy()
-        self.servo.turnMiddle()
         self.led_ctrl.destroy()
         RGB.both_off()
         self.led.colorWipe(0, 0, 0)
@@ -81,7 +75,6 @@ class Robot:
 class Sensors:
     def __init__(self, robot):
         self.robot = robot
-        self.camera = cv2.VideoCapture(0)
         self.parametres = cv2.aruco.DetectorParameters_create()
         self.dictionnaire = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
 
@@ -97,9 +90,11 @@ class Sensors:
         self.camera.release()
 
     def take_image(self):
-        x, image = self.camera.read()
-        self.release_resources()
+        camera = cv2.VideoCapture(0)
+        x, image = camera.read()
+        camera.release()
         cv2.imwrite("imageInitiale.png", image)
+        sens_fleche = None
         coinsMarqueurs, idsMarqueur, _ = cv2.aruco.detectMarkers(image, self.dictionnaire, parameters=self.parametres)
         if idsMarqueur is not None and len(coinsMarqueurs) == 4 and len(set(idsMarqueur.flatten())) == 1:
             self.robot.stop()  # Utiliser l'instance de Robot stockée
@@ -138,20 +133,24 @@ class Sensors:
         
         sens_fleche = None
         chiffre = None
+        detection_instance = detection_class.Detection()  # Créez une instance de Detection
         if idsMarqueur[0] == 8: #? L'ID des rectangles de couleur est 8
             print("🤔 Il devrait y avoir un rectangle de couleur dans la zone zoomée")
-            value_return = detection_class.Detection.rectangle(image_zoomee) 
+            value_return = detection_instance.rectangle(image_zoomee) 
             return value_return #! 1 --> panneau rouge / 2 --> panneau vert / 3 --> panneau jaune
         
         elif idsMarqueur[0] == 13: #? L'ID de la flèche est 13
             print("🔍 On recherche une flèche dans l'image zoomée")
-            sens_fleche = detection_class.Detection.fleche(image_zoomee)
-            return sens_fleche  #! 4 --> Droite / 5 --> Gauche
+            value_return = detection_instance.fleche(image_zoomee)
+            return value_return  #! 4 --> Droite / 5 --> Gauche
         
         elif idsMarqueur[0] == 9: #? L'ID des chiffres est 9
             print("🔢 On va essayer de voir si y'a un chiffre dans l'image")
-            chiffre_return = detection_class.Detection.chiffre(image_zoomee) # 0 --> rien détecté / 1 --> Chiffre détecté et mis dans le terminal
+            if image != None:
+                print("L'image fonctionne !")
+            value_return = detection_instance.chiffre(image_zoomee)  # Appelez la méthode chiffre() sur l'instance
             return 6 #! 6 --> Chiffre détecté
+        
         else:
             print("🚫 Rien de connu n'a été détecté...")
             return 0
