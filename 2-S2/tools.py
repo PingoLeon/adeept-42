@@ -2,6 +2,7 @@ import sys
 import cv2
 import numpy as np
 import detection_class
+import time
 
 sys.path.insert(0,'/home/pi/adeept_picar-b/server/')
 import RPi.GPIO as GPIO
@@ -89,7 +90,7 @@ class Sensors:
     def release_resources(self):
         self.camera.release()
 
-    def take_image(self):
+    def take_image(self, count_recursivite = 0):
         camera = cv2.VideoCapture(0)
         x, image = camera.read()
         camera.release()
@@ -98,13 +99,13 @@ class Sensors:
         coinsMarqueurs, idsMarqueur, _ = cv2.aruco.detectMarkers(image, self.dictionnaire, parameters=self.parametres)
         if idsMarqueur is not None and len(coinsMarqueurs) == 4 and len(set(idsMarqueur.flatten())) == 1:
             self.robot.stop()  # Utiliser l'instance de Robot stockée
-            sens_fleche = self.zoomIn(image, coinsMarqueurs, idsMarqueur)
+            sens_fleche = self.zoomIn(image, coinsMarqueurs, idsMarqueur, count_recursivite)
             return sens_fleche
         else:
             return None
     
 
-    def zoomIn(self, image, coinsMarqueurs, idsMarqueur):
+    def zoomIn(self, image, coinsMarqueurs, idsMarqueur, count_recursivite = 0):
         print("✅ 4 Arucos avec le même identifiant trouvés !")
         ids = idsMarqueur.flatten()	
         tous_coins = []
@@ -123,6 +124,8 @@ class Sensors:
         offset = 35
         if idsMarqueur[0] == 13:
             offset = 15
+        if idsMarqueur[0] == 9:
+            offset = 25
             
         points1 = np.float32([top_left + [offset, offset], top_right + [-offset, offset], bottom_right + [-offset, -offset], bottom_left + [offset, -offset]])
         points2 = np.float32([[0, 0], [200, 0], [200, 200], [0, 200]])
@@ -146,11 +149,30 @@ class Sensors:
         
         elif idsMarqueur[0] == 9: #? L'ID des chiffres est 9
             print("🔢 On va essayer de voir si y'a un chiffre dans l'image")
-            if image != None:
-                print("L'image fonctionne !")
-            value_return = detection_instance.chiffre(image_zoomee)  # Appelez la méthode chiffre() sur l'instance
+            chiffre_return = detection_instance.chiffre(image_zoomee) # 0 --> rien détecté / 1 --> Chiffre détecté et mis dans le terminal
+            
+            if chiffre_return == 0:
+                print("♻️ On relance un cycle ! -> ",count_recursivite)
+                if count_recursivite >= 15:
+                    print("🛑 Trop de cycles, on arrête")
+                    return 0
+                count_recursivite += 1
+                self.take_image(count_recursivite)
             return 6 #! 6 --> Chiffre détecté
-        
         else:
             print("🚫 Rien de connu n'a été détecté...")
             return 0
+
+if __name__ == '__main__':
+    
+    robot = Robot(move, servo)
+    robot.setup()
+    sensors = Sensors(robot)
+    while 1:
+        robot.reset_head()
+        time.sleep(2)
+        robot.tilt_head_right()
+        time.sleep(2)
+        robot.tilt_head_left()
+        time.sleep(2)
+    

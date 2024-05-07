@@ -53,7 +53,7 @@ def scan():
     
 #Avancer tant qu'aucun obstacle à 30cm
 def scenario_lab_scan(value_turn):
-    angle_rate = 0.35
+    angle_rate = 0.40
     sens_fleche = None
     global robot
     robot = tools.Robot(move, servo)
@@ -72,6 +72,10 @@ def scenario_lab_scan(value_turn):
                 print("📡 On scan 360° ")
                 robot.stop()
                 value_turn = scan()
+                sens_fleche = sensors.take_image()
+                if sens_fleche == 6:
+                    print("🚨 Chiffre vu ! On arrête tout !")
+                    os._exit(0)
             else:
                 value_turn = sens_fleche
         print("Manoeuvre !")
@@ -83,12 +87,16 @@ def scenario_lab_scan(value_turn):
             servo.turnLeft(angle_rate)
         sens_fleche = None
         value_turn = None
-        move.move(65, 'forward')
+        move.move(62, 'forward')
         i = 0
         dist = sensors.check_distance_average()
-        while i <= 2 and dist >= 15:
+        while i <= 2 and dist >= 25:
             dist = sensors.check_distance_average()
-            time.sleep(0.01)
+            sens_fleche = sensors.take_image()
+            if sens_fleche == 6:
+                print("🚨 Chiffre vu ! On arrête tout !")
+                os._exit(0)
+            time.sleep(0.001)
             i += 0.01
         servo.turnMiddle()
 
@@ -104,6 +112,11 @@ def labyrinthe(value_turn):
 
 if __name__ == '__main__':
     try:
+        global robot
+        robot = tools.Robot(move, servo)
+        robot.setup()
+        robot.reset_head()
+        move.setup()
         labyrinthe(4)
     except KeyboardInterrupt:
         pass

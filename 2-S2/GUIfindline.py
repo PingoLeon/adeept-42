@@ -32,7 +32,7 @@ def behavior(value_return):
         robot.set_led_front("red")
         robot.set_led_back(255,0,0)
         time.sleep(1)
-        print("\n🔃On repart !")
+        print("\n🔃 On repart !")
         
     elif value_return == 2:
         print("\n🟡 Un panneau jaune a été détecté ! 🟡 \n")
@@ -40,6 +40,7 @@ def behavior(value_return):
         robot.set_led_front("yellow")
         robot.set_led_back(0,255,255)
         time.sleep(1)
+        print("\n🔃 On repart !")
         
     elif value_return == 3:
         print("\n🟢 Un panneau vert a été détecté ! 🟢\n")
@@ -47,6 +48,7 @@ def behavior(value_return):
         robot.set_led_front("green")
         robot.set_led_back(0,255,0)
         time.sleep(1)
+        print("\n🔃 On repart !")
         
     elif value_return == 4 or value_return == 5:
         print("\n🤠 MODE LABYRINTHE 🤠\n")
@@ -146,7 +148,7 @@ def run(previous_move):
     
     else:
         if previous_move != "Back":
-            print('Back')
+            print('Retour à la ligne')
         robot.set_led_back(255,0,0)
         if not backing == 1:
             if check_true_out == 1:
