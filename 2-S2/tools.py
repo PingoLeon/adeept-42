@@ -86,11 +86,8 @@ class Sensors:
             distance_list.append(distance)
         average_distance = sum(distance_list) / len(distance_list)
         return average_distance
-
-    def release_resources(self):
-        self.camera.release()
-
-    def take_image(self, count_recursivite = 0):
+    
+    def take_image(self):
         camera = cv2.VideoCapture(0)
         x, image = camera.read()
         camera.release()
@@ -105,7 +102,7 @@ class Sensors:
             return None
     
 
-    def zoomIn(self, image, coinsMarqueurs, idsMarqueur, count_recursivite = 0):
+    def zoomIn(self, image, coinsMarqueurs, idsMarqueur):
         print("✅ 4 Arucos avec le même identifiant trouvés !")
         ids = idsMarqueur.flatten()	
         tous_coins = []
