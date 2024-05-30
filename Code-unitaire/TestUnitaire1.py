@@ -20,10 +20,6 @@ dist_to_check_max = 50
 last_turn = 0
 turn_status = 0
 
-class LabyrintheModeException(Exception):
-    def __init__(self, value):
-        self.value = value
-
 def behavior(value_return):
     #! Fonction behavior pour faire différentes actions en fonction de ce qui a été observé, return 1 toujours
     if value_return == 1:
@@ -52,10 +48,8 @@ def behavior(value_return):
         print("\n🔃 On repart !")
         
     elif value_return == 4 or value_return == 5:
-        print("\n🤠 MODE LABYRINTHE 🤠\n")
         robot.reset_head()
         time.sleep(1)
-        raise LabyrintheModeException(value_return)
     
     robot.reset_head()
 
@@ -111,7 +105,7 @@ def run(previous_move):
         robot.stop()
         checkcam()
         move.move(60, 'forward')
-        time.sleep(0.4)
+        time.sleep(0.5)
         previous_move = "Camera"
         
     elif status_right == color_select:
@@ -193,14 +187,8 @@ if __name__ == '__main__':
         
         previous_move = ""
         while 1:
-            try:
                 previous_move = run(previous_move)
-            except LabyrintheModeException as e:
-                robot.stop()
-                
-                labyrinthe.labyrinthe(e.value)
         pass
     except KeyboardInterrupt:
-        os.remove(firstnombrelu.txt)
         robot.stop()
         robot.destroy()

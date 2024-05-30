@@ -125,7 +125,7 @@ class Sensors:
         if idsMarqueur[0] == 13:
             offset = 15
         if idsMarqueur[0] == 9:
-            offset = 35
+            offset = 30
             
         points1 = np.float32([top_left + [offset, offset], top_right + [-offset, offset], bottom_right + [-offset, -offset], bottom_left + [offset, -offset]])
         points2 = np.float32([[0, 0], [200, 0], [200, 200], [0, 200]])

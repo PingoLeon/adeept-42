@@ -118,6 +118,12 @@ def detection(count_recursivite = 0):
     # vérifier si les centres forment un rectangle
     (topLeft, topRight, bottomLeft, bottomRight) = centres
 
+    if est_un_rectangle(topLeft, topRight, bottomRight, bottomLeft):
+        print("👍 Les Aruco markers forment un rectangle")
+    else:
+        print("🛑 Les ArUco markers ne forment pas un rectangle")
+        detection()
+
     #! Déformer l’image pour ne travailler que dans la zone d’intérêt définie par ces 4 marqueurs
     print("🔍 On zoom sur l'image dans la zone des 4 marqueurs")
     tous_coins = np.concatenate(tous_coins)

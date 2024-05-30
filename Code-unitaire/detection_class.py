@@ -1,42 +1,9 @@
 import numpy as np
 import cv2
-import os
-import io
-import sys
 
 class Detection:
     def __init__(self):
         pass
-    
-    def check_and_write(self,nombrelu):
-        filename = "firstnombrelu.txt"
-
-        # Vérifier si le fichier existe
-        if os.path.exists(filename):
-            with io.open(filename, 'r') as file:
-                first_number = file.read()
-
-                # Si un nombre est déjà inscrit dedans
-                if first_number:
-                    # Si nombrelu est identique
-                    if first_number == str(nombrelu):
-                        print("\n Le chiffre lu est identique à celui qu'on a vu en premier !\nOn arrête tout...")
-                        # Arrêter totalement le programme (kill python)
-                        
-                        os.remove(filename)
-                        os._exit(0)
-                    else:
-                        print("\n Pas le même nombre, on continue !")
-                else:
-                    # Si le fichier n'a pas de chiffre inscrit dedans
-                    print("\n On a jamais vu ce nombre, on l'inscrit pour plus tard !")
-                    with io.open(filename, 'w') as file:
-                        file.write(str(nombrelu))
-        else:
-            # Si le fichier n'existe pas
-            print("\n On a jamais vu ce nombre, on l'inscrit pour plus tard !")
-            with io.open(filename, 'w') as file:
-                file.write(str(nombrelu))
 
     def chiffre(self,image):
         #Dictionnaire de correspondance
@@ -109,9 +76,6 @@ class Detection:
         else:
             nombrelu = correspondances[tuple(on)]
             print("✅ On a trouvé le chiffre : ", nombrelu)
-            
-            #! Fonction pour tout arrêter si on a déjà vu ce nombre
-            self.check_and_write(nombrelu)
             return 1
         
     def rectangle(self, image):

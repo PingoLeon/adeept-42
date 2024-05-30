@@ -90,6 +90,9 @@ def scenario_lab_scan(value_turn):
         while i <= 2 and dist >= 25:
             dist = sensors.check_distance_average()
             sens_fleche = sensors.take_image()
+            if sens_fleche == 6:
+                print("🚨 Chiffre vu ! On arrête tout !")
+                os._exit(0)
             time.sleep(0.001)
             i += 0.01
         servo.turnMiddle()
