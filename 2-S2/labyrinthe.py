@@ -87,7 +87,7 @@ def scenario_lab_scan(value_turn):
         move.move(62, 'forward')
         i = 0
         dist = sensors.check_distance_average()
-        while i <= 2 and dist >= 25:
+        while i <= 2 and dist >= 25:                     # and ou or ?
             dist = sensors.check_distance_average()
             sens_fleche = sensors.take_image()
             time.sleep(0.001)
